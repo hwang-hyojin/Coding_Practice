@@ -12,7 +12,7 @@ struct FISH {
 int dy[] = {0,-1,-1,-1,0,1,1,1};
 int dx[] = {-1,-1,0,1,1,1,0,-1};
 
-int dfs(int originmap[4][4], int x, int y, int dir,FISH originfish[17])
+int dfs(int originmap[4][4], int x, int y,FISH originfish[17])
 {
 	//이전 값 복사해놓기
 	int map[4][4];
@@ -28,15 +28,14 @@ int dfs(int originmap[4][4], int x, int y, int dir,FISH originfish[17])
 	
 	//상어위치 설정
 	int eat = map[x][y];
-	dir = fish[map[x][y]].dir;
+	int dir = fish[map[x][y]].dir;
+	int ans = 0;
 	
 	//상어 위치 -1로 표시, live false로 바꿔주기
 	fish[map[x][y]].x = -1;
 	fish[map[x][y]].y = -1;
 	fish[map[x][y]].live = false;
 	map[x][y] = 0; //상어가 먹음
-	
-	int ans = 0;
 	
 	//물고기 이동 작은 물고기부터 16칸 다 돌기
 	for(int i = 1; i<= 16; ++i){
@@ -70,13 +69,6 @@ int dfs(int originmap[4][4], int x, int y, int dir,FISH originfish[17])
 			}
 			//이부분은 뭐지 ?
 			//next위치의 물고기와 자리 바꾸기
-			if(map[cx][cy] == 0) { //물고기가 없다면?
-				map[fish[i].x][fish[i].y] = 0;
-				map[cx][cy] = i;
-				fish[i].x = cx;
-				fish[i].y = cy;
-			}
-			else {
 				int tx, ty, tmp;
 				tx = fish[i].x;
 				ty = fish[i].y;
@@ -87,18 +79,20 @@ int dfs(int originmap[4][4], int x, int y, int dir,FISH originfish[17])
 				
 				map[tx][ty] = map[cx][cy];
 				map[cx][cy] = i;
-			}
+			
 		}
 	} //물고기 이동 종료
 	
+	//상어 이동 시작
 	int nx = x + dx[dir];
 	int ny = y + dy[dir];
 	
+	//상어는 범위 내에서 여러칸을 돌면서 모든 경우를 계산
 	while(!(nx<0||nx>3||ny<0||ny>3)){
 		if(map[nx][ny] != 0)
-			ans = max(ans, dfs(map,nx,ny,dir,fish));
-		nx += dx[dir];
-		ny += dy[dir];
+			ans = max(ans, dfs(map,nx,ny,fish));
+		nx += dx[dir]; //여러칸을 이동하는 경우
+		ny += dy[dir]; //여러칸을 이동하는 경우
 	}
 	return ans + eat;
 }
@@ -117,6 +111,6 @@ int main() {
 		}
 	}
 	
-	printf("%d\n",dfs(map,0,0,0,fish));
+	printf("%d\n",dfs(map,0,0,fish));
 	return 0;
 }
